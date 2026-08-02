@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { siteConfig } from "../site-config";
+export function LegalPage({title,updated,children}:{title:string;updated:string;children:React.ReactNode}){return <><header className="legal-header"><div className="container"><Link href="/" className="brand"><span className="mark"><i/></span><b>{siteConfig.brandName||siteConfig.brandDescriptor}</b></Link><Link href="/">← Volver al inicio</Link></div></header><main className="legal-page"><div className="container"><p className="eyebrow">INFORMACIÓN LEGAL</p><h1>{title}</h1><p className="updated">Última actualización: {updated}</p><div className="legal-copy">{children}</div></div></main></>}

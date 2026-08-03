@@ -3,6 +3,7 @@ const SHEET_NAME = "Postulaciones";
 const CURRENT_POLICY_VERSION = "1.0 — 3 de agosto de 2026";
 const RETENTION_MONTHS = 12;
 const CONFIRMATION_STATUS_COLUMN = 13;
+const OWNER_NOTIFICATION_STATUS_COLUMN = 14;
 const CONTACT_EMAIL = "felipepardobarrera@gmail.com";
 const SITE_URL = "https://billetera-vehicular-chile.felipepardobarrera.chatgpt.site";
 
@@ -22,7 +23,7 @@ function doPost(e) {
         new Date(), clean_(payload.name,120), clean_(payload.email,180), clean_(payload.phone,30),
         clean_(payload.region,80), clean_(payload.vehicles,20), clean_(payload.type,80),
         clean_(payload.problem,1000), "Sí", "Nuevo", "Landing web",
-        clean_(payload.policyVersion || CURRENT_POLICY_VERSION,120), "Pendiente"
+        clean_(payload.policyVersion || CURRENT_POLICY_VERSION,120), "Pendiente", "Pendiente"
       ]);
       row = sheet.getLastRow();
     } finally {
@@ -37,7 +38,20 @@ function doPost(e) {
       emailStatus = String(emailError).indexOf("CUOTA_AGOTADA") !== -1 ? "Sin cuota" : "Error";
     }
     sheet.getRange(row, CONFIRMATION_STATUS_COLUMN).setValue(emailStatus);
-    return json_({ok:true,emailSent:emailStatus === "Enviado"});
+
+    let ownerNotificationStatus = "Enviado";
+    try {
+      sendOwnerNotification_(payload);
+    } catch (ownerEmailError) {
+      console.error("No se pudo enviar el aviso al administrador:", ownerEmailError);
+      ownerNotificationStatus = String(ownerEmailError).indexOf("CUOTA_AGOTADA") !== -1 ? "Sin cuota" : "Error";
+    }
+    sheet.getRange(row, OWNER_NOTIFICATION_STATUS_COLUMN).setValue(ownerNotificationStatus);
+    return json_({
+      ok:true,
+      emailSent:emailStatus === "Enviado",
+      ownerNotified:ownerNotificationStatus === "Enviado"
+    });
   } catch (error) {
     console.error(error);
     return json_({ok:false,error:"No fue posible registrar la postulación."});
@@ -69,6 +83,29 @@ function sendConfirmationEmail_(payload) {
   });
 }
 
+function sendOwnerNotification_(payload) {
+  if (MailApp.getRemainingDailyQuota() < 1) throw new Error("CUOTA_AGOTADA");
+  const subject = "Nueva postulación — " + String(payload.name || "").trim();
+  const body = [
+    "Se recibió una nueva postulación en Billetera vehicular.", "",
+    "Nombre: " + String(payload.name || "").trim(),
+    "Correo: " + String(payload.email || "").trim(),
+    "Teléfono: " + String(payload.phone || "").trim(),
+    "Región: " + String(payload.region || "").trim(),
+    "Cantidad de vehículos: " + String(payload.vehicles || "").trim(),
+    "Tipo de usuario: " + String(payload.type || "").trim(),
+    "Problema que quiere resolver:",
+    String(payload.problem || "").trim(), "",
+    "Revisa la postulación completa en Google Sheets."
+  ].join("\n");
+  MailApp.sendEmail({
+    to: CONTACT_EMAIL,
+    subject: subject,
+    body: body,
+    name: "Billetera vehicular",
+    replyTo: String(payload.email || "").trim()
+  });
+}
 // Ejecuta esta función una vez desde el editor para autorizar el envío de correos.
 function authorizeEmail() {
   Logger.log("Cuota diaria restante: " + MailApp.getRemainingDailyQuota());

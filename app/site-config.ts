@@ -8,5 +8,5 @@ export const siteConfig = {
   instagramUrl: "",
   founderProgramEnabled: true,
   siteUrl: "https://billetera-vehicular.sites.openai.com",
-  founderFormEndpoint: "",
+  founderFormEndpoint: "/api/founders",
 } as const;

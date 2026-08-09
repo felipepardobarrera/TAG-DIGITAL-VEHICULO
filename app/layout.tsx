@@ -17,9 +17,9 @@ export const metadata: Metadata = {
     description: "Menos papeles, menos olvidos y más control para conductores en Chile.",
     type: "website",
     locale: "es_CL",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Billetera vehicular digital en un teléfono" }],
+    images: [{ url: "/og-v2.png", width: 1731, height: 909, alt: "Billetera vehicular digital en un teléfono" }],
   },
-  twitter: { card: "summary_large_image", title: "Billetera vehicular", description: "Tus documentos, vencimientos y mantenciones en un solo lugar.", images: ["/og.png"] },
+  twitter: { card: "summary_large_image", title: "Billetera vehicular", description: "Tus documentos, vencimientos y mantenciones en un solo lugar.", images: ["/og-v2.png"] },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

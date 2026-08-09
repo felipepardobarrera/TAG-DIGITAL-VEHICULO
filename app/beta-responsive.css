@@ -22,6 +22,24 @@
   width: 100%;
 }
 
+.beta-mini-form input,
+.beta-doc-form input,
+.beta-doc-form select,
+.beta-auth-card input {
+  color: #071018;
+  caret-color: #00a8ff;
+  -webkit-text-fill-color: #071018;
+  opacity: 1;
+}
+
+.beta-mini-form input::placeholder,
+.beta-doc-form input::placeholder,
+.beta-auth-card input::placeholder {
+  color: #7b8d97;
+  -webkit-text-fill-color: #7b8d97;
+  opacity: 1;
+}
+
 .beta-channels {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

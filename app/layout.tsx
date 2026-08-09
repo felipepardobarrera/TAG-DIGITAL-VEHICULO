@@ -7,6 +7,7 @@ import "./beta.css";
 import "./reminders.css";
 import "./founders.css";
 import "./beta-responsive.css";
+import "./inspection.css";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"], display: "swap" });
 

@@ -172,3 +172,61 @@
     font-size: 11px;
   }
 }
+
+.beta-main aside > button small {
+  display: block;
+  margin-top: 4px;
+  color: #9fdfff;
+  font-size: 11px;
+}
+
+.fleet-toggle {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #2c5261;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.fleet-toggle input {
+  width: 18px !important;
+  height: 18px;
+  margin: 0;
+}
+
+.fleet-toggle span,
+.fleet-toggle small {
+  display: block;
+}
+
+.fleet-fields {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(0, 169, 255, 0.08);
+}
+
+.doc-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.beta-docs .renew-button {
+  border-color: #ff5a1f;
+  color: #c73d0b;
+}
+
+@media (max-width: 520px) {
+  .doc-actions {
+    justify-content: stretch;
+  }
+
+  .doc-actions button {
+    flex: 1;
+  }
+}

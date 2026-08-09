@@ -5,6 +5,7 @@ import "./globals.css";
 import "./overrides.css";
 import "./beta.css";
 import "./reminders.css";
+import "./founders.css";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"], display: "swap" });
 

@@ -23,6 +23,7 @@
 }
 
 .beta-mini-form input,
+.beta-mini-form select,
 .beta-doc-form input,
 .beta-doc-form select,
 .beta-auth-card input {
@@ -30,6 +31,15 @@
   caret-color: #00a8ff;
   -webkit-text-fill-color: #071018;
   opacity: 1;
+}
+
+.beta-mini-form select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #ccd8de;
+  border-radius: 8px;
+  padding: 9px;
+  background: #f9fbfc;
 }
 
 .beta-mini-form input::placeholder,

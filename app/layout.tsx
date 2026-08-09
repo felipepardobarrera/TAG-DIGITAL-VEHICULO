@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import { siteConfig } from "./site-config";
 import "./globals.css";
 import "./overrides.css";
+import "./beta.css";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"], display: "swap" });
 

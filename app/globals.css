@@ -14,14 +14,18 @@
 .hero.hero-image:before,.hero.hero-image:after{display:none}
 .hero-art-wrap{position:relative}
 .hero-art{display:block;width:100%;height:auto;border-radius:20px;border:1px solid #14364f;box-shadow:0 28px 90px rgba(0,0,0,.6),0 0 45px rgba(0,140,255,.12)}
+.hero-live-copy{position:absolute;left:4.7%;top:13%;color:#fff;text-transform:none;text-shadow:0 5px 22px #000}
+.hero-live-copy .hero-brand-title{margin:0;font-size:clamp(42px,5.3vw,76px);font-weight:900;line-height:.9;letter-spacing:-.055em;text-transform:uppercase}
+.hero-live-copy>i{display:block;width:66px;height:6px;margin:22px 0 18px;border-radius:8px;background:var(--action);box-shadow:0 0 18px rgba(255,90,31,.5)}
+.hero-live-copy>p:last-child{margin:0;font-size:clamp(18px,2vw,28px);line-height:1.35;font-style:italic;font-weight:450}
 .hero-art-actions{position:absolute;left:4.7%;bottom:12%;display:flex;align-items:center;gap:18px}
 .hero-art-actions .button{padding:13px 18px}
 .hero-art-actions>a:last-child{display:inline-flex;align-items:center;color:#fff;font-size:13px;font-weight:750;text-shadow:0 2px 8px #000}
 .hero-art-actions>a:last-child i{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;margin-right:8px;border:1px solid #2675a9;border-radius:50%;background:#071828;font-style:normal;font-size:9px}
 .hero-art-trust{position:absolute;left:4.7%;bottom:4.2%;display:flex;gap:18px;color:#b9d7eb;font-size:10px;font-weight:700}
 .hero-art-trust span{display:flex;align-items:center;gap:5px}.hero-art-trust svg{color:var(--electric)}
-@media(max-width:900px){.hero.hero-image{padding-top:20px}.hero-art{border-radius:14px}.hero-art-actions{position:static;margin-top:22px;justify-content:center}.hero-art-trust{position:static;margin-top:18px;justify-content:center}}
-@media(max-width:600px){.hero.hero-image{padding:12px 0 28px}.hero-art-wrap{width:calc(100% - 20px)}.hero-art{border-radius:10px}.hero-art-actions{flex-direction:column;gap:12px}.hero-art-actions .button{width:100%}.hero-art-trust{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}.hero-art-trust span:last-child{grid-column:1/-1}.hero-art-actions>a:last-child{font-size:12px}}
+@media(max-width:900px){.hero.hero-image{padding-top:20px}.hero-art{border-radius:14px}.hero-live-copy{position:static;margin:24px auto 0;text-align:center;text-shadow:none}.hero-live-copy .hero-brand-title{font-size:clamp(42px,8vw,62px)}.hero-live-copy>i{margin:18px auto}.hero-art-actions{position:static;margin-top:22px;justify-content:center}.hero-art-trust{position:static;margin-top:18px;justify-content:center}}
+@media(max-width:600px){.hero.hero-image{padding:12px 0 28px}.hero-art-wrap{width:calc(100% - 20px)}.hero-art{border-radius:10px}.hero-live-copy{margin-top:20px}.hero-live-copy .hero-brand-title{font-size:42px}.hero-live-copy>p:last-child{font-size:18px}.hero-live-copy>i{width:48px;height:5px;margin:15px auto}.hero-art-actions{flex-direction:column;gap:12px}.hero-art-actions .button{width:100%}.hero-art-trust{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}.hero-art-trust span:last-child{grid-column:1/-1}.hero-art-actions>a:last-child{font-size:12px}}
 
 /* Identidad automotriz y planes */
 .hero{background:radial-gradient(circle at 88% 45%,#d9f2ff 0,transparent 31%),linear-gradient(110deg,#fbfcfc 56%,#eef7fc)}

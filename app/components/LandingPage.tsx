@@ -145,16 +145,6 @@ const benefits = [
     "Recibe avisos antes de que un documento venza.",
   ],
   [
-    "wrench",
-    "Mantenciones registradas.",
-    "Consulta las mantenciones realizadas y programa el próximo servicio.",
-  ],
-  [
-    "car",
-    "Varios vehículos en una cuenta.",
-    "Administra cada vehículo sin mezclar su información.",
-  ],
-  [
     "qr",
     "Acceso mediante QR o NFC.",
     "Abre la información autorizada mediante un código QR, tarjeta o llavero NFC.",
@@ -163,16 +153,6 @@ const benefits = [
     "shield",
     "Información bajo tu autorización.",
     "Selecciona los documentos que otras personas podrán consultar.",
-  ],
-  [
-    "link",
-    "Enlaces temporales.",
-    "Genera accesos que se desactivan automáticamente.",
-  ],
-  [
-    "shield",
-    "Tarjetas desactivables.",
-    "Desactiva una tarjeta perdida e impide nuevos accesos.",
   ],
 ];
 function DemoRow({
@@ -704,14 +684,6 @@ const profiles = [
     "Organiza los documentos y mantenciones del vehículo que utilizas para trabajar.",
   ],
   [
-    "Automovilismo",
-    "Registra antecedentes técnicos y mantenciones para cada actividad en pista.",
-  ],
-  [
-    "Talleres y clubes",
-    "Comparte documentos específicos mediante accesos temporales.",
-  ],
-  [
     "Flotas de vehículos",
     "Centraliza vehículos, documentos, responsables y vencimientos desde una misma cuenta.",
   ],
@@ -751,8 +723,7 @@ export function LandingPage() {
       {banner && (
         <div className="topbar">
           <p>
-            Estamos seleccionando a los primeros conductores que probarán una
-            nueva forma de organizar su vehículo.
+            Programa piloto: 12 meses sin costo para las primeras 10 cuentas confirmadas.
           </p>
           <button onClick={() => setBanner(false)} aria-label="Cerrar aviso">
             ×
@@ -779,7 +750,8 @@ export function LandingPage() {
             ))}
           </nav>
           <Link className="nav-cta" href="/beta">
-            Entrar a la beta
+            <span className="nav-cta-full">Ingresar a mi cuenta</span>
+            <span className="nav-cta-short">Ingresar</span>
           </Link>
           <button
             className="hamb"
@@ -817,7 +789,7 @@ export function LandingPage() {
               </p>
             </div>
             <div className="hero-art-actions">
-              <Button>Quiero acceso anticipado</Button>
+              <Button>Postular al programa piloto</Button>
               <button
                 className="hero-info-button"
                 onClick={() => {
@@ -830,6 +802,10 @@ export function LandingPage() {
               >
                 <i>▶</i> Ver cómo funciona
               </button>
+            </div>
+            <div className="hero-pilot-badge">
+              <b>12 MESES SIN COSTO</b>
+              <span>Programa piloto para las primeras 10 cuentas confirmadas</span>
             </div>
             <div className="hero-art-trust">
               <span>
@@ -845,6 +821,13 @@ export function LandingPage() {
                 Diseñado para Chile
               </span>
             </div>
+          </div>
+        </section>
+        <section className="trust-bar" aria-label="Información de confianza">
+          <div className="container">
+            <span><I n="shield" s={20}/><b>Privacidad desde el diseño</b><small>Accesos protegidos y controlados por el usuario</small></span>
+            <span><I n="car" s={20}/><b>Proyecto chileno</b><small>Responsable: Felipe Pardo Barrera</small></span>
+            <span><I n="check" s={20}/><b>Programa piloto transparente</b><small>Sin cobros ni compromisos durante la prueba</small></span>
           </div>
         </section>
         <section className="section problem">
@@ -1042,26 +1025,9 @@ export function LandingPage() {
           <div className="container">
             <Heading
               kicker="AVISOS DE VENCIMIENTO"
-              title="Seis avisos para facilitar la renovación de tus documentos."
+              title="Recibe avisos mientras un documento requiere atención."
+              text="La billetera informa antes del vencimiento, el día correspondiente y mientras la renovación permanezca pendiente."
             />
-            <div className="reminder-timeline">
-              {[
-                ["30", "Planificación"],
-                ["14", "Preparación"],
-                ["7", "Renovación recomendada"],
-                ["1", "Último aviso"],
-                ["0", "Vence hoy"],
-                ["+", "Continúa vencido"],
-              ].map((x, i) => (
-                <article key={x[1]} className={i === 5 ? "late" : ""}>
-                  <b>{x[0]}</b>
-                  <small>
-                    {i < 4 ? "DÍAS ANTES" : i === 4 ? "HOY" : "DESPUÉS"}
-                  </small>
-                  <span>{x[1]}</span>
-                </article>
-              ))}
-            </div>
             <div className="reminder-channels">
               <div>
                 <span>@</span>
@@ -1098,57 +1064,8 @@ export function LandingPage() {
               </div>
             </div>
             <p className="reminder-honesty">
-              El envío automático por correo se activará al completar la
-              conexión del proveedor de mensajería. Las fechas y la opción de
-              calendario están disponibles en el panel.
+              Las fechas y la opción de calendario están disponibles en la beta. El correo automático se activará al completar la conexión del proveedor de mensajería.
             </p>
-          </div>
-        </section>
-        <section className="section explore-product">
-          <div className="container">
-            <Heading
-              kicker="CONOCE EL PRODUCTO"
-              title="Conoce cada función de tu Billetera Vehicular."
-              text="Tienes acceso a guías específicas para conocer el funcionamiento de cada servicio."
-            />
-            <div className="explore-grid">
-              <Link href="/productos">
-                <span>▦</span>
-                <h3>QR, tarjeta y llavero</h3>
-                <p>Modalidades, disponibilidad y precios estimados.</p>
-                <b>Ver productos →</b>
-              </Link>
-              <Link href="/documentos">
-                <span>▤</span>
-                <h3>Documentos admitidos</h3>
-                <p>Catálogo, vencimientos y uso responsable.</p>
-                <b>Ver documentos →</b>
-              </Link>
-              <Link href="/fiscalizacion/guia">
-                <span>◎</span>
-                <h3>Proceso de fiscalización</h3>
-                <p>Cómo generar, mostrar y finalizar un acceso temporal.</p>
-                <b>Ver la guía →</b>
-              </Link>
-              <Link href="/flotas">
-                <span>▥</span>
-                <h3>Flotas y responsables</h3>
-                <p>Vehículos, responsables, mantenciones y alertas.</p>
-                <b>Explorar flotas →</b>
-              </Link>
-              <Link href="/buscar-vehiculo">
-                <span>⌕</span>
-                <h3>Buscar mi vehículo</h3>
-                <p>Acceso seguro mediante código temporal.</p>
-                <b>Próximamente →</b>
-              </Link>
-              <Link href="/como-funciona">
-                <span>▶</span>
-                <h3>Guía completa</h3>
-                <p>Registro, documentos, avisos y demostraciones.</p>
-                <b>Cómo funciona →</b>
-              </Link>
-            </div>
           </div>
         </section>
         <section className="section benefits" id="beneficios">
@@ -1192,51 +1109,6 @@ export function LandingPage() {
             <Demo />
           </div>
         </section>
-        <section className="section comparison">
-          <div className="container">
-            <div className="center">
-              <p className="eyebrow">INFORMACIÓN ORGANIZADA</p>
-              <h2>Centraliza los antecedentes de tus vehículos.</h2>
-            </div>
-            <div className="compare">
-              <article>
-                <small>SIN LA PLATAFORMA</small>
-                <h3>La información permanece distribuida.</h3>
-                {[
-                  "Documentos en distintos lugares",
-                  "Fechas difíciles de controlar",
-                  "Información difícil de compartir",
-                  "Mantenciones sin registro",
-                  "Dependencia de una sola persona",
-                ].map((x) => (
-                  <p key={x}>
-                    <i>×</i>
-                    {x}
-                  </p>
-                ))}
-              </article>
-              <b>→</b>
-              <article>
-                <small>CON BILLETERA VEHICULAR</small>
-                <h3>
-                  Consulta documentos, fechas y accesos desde un solo lugar.
-                </h3>
-                {[
-                  "Documentos centralizados",
-                  "Avisos de vencimiento",
-                  "Acceso temporal mediante QR",
-                  "Mantenciones registradas",
-                  "Tú decides quién consulta la información",
-                ].map((x) => (
-                  <p key={x}>
-                    <i>✓</i>
-                    {x}
-                  </p>
-                ))}
-              </article>
-            </div>
-          </div>
-        </section>
         <section className="section profiles" id="perfiles">
           <div className="container">
             <Heading
@@ -1260,41 +1132,6 @@ export function LandingPage() {
                   </button>
                 </article>
               ))}
-            </div>
-          </div>
-        </section>
-        <section className="section motorsport">
-          <div className="container motorsport-grid">
-            <div>
-              <p className="eyebrow green">AUTOMOVILISMO</p>
-              <h2>Información técnica para vehículos utilizados en pista.</h2>
-              <p>
-                Organiza documentos, mantenciones y antecedentes técnicos
-                asociados a cada vehículo.
-              </p>
-              <div className="available">
-                <small>DISPONIBLE EN LA VERSIÓN BETA</small>
-                <b>✓ Documentos, mantenciones y accesos temporales.</b>
-              </div>
-            </div>
-            <div className="future">
-              <small>FUNCIONES PLANIFICADAS</small>
-              <h3>Nuevas herramientas para uso técnico.</h3>
-              <div>
-                {[
-                  "Actividades en pista",
-                  "Historial técnico",
-                  "Neumáticos y componentes",
-                  "Configuraciones de circuito",
-                  "Fotografías",
-                  "Contactos de emergencia",
-                  "Preparadores y clubes",
-                  "Perfil de competición",
-                ].map((x) => (
-                  <span key={x}>{x} ↗</span>
-                ))}
-              </div>
-              <p>Estas funciones todavía no se encuentran disponibles.</p>
             </div>
           </div>
         </section>
@@ -1521,8 +1358,8 @@ export function LandingPage() {
                 )}
                 <ul>
                   <li>✓ Desde 5 vehículos</li>
-                  <li>✓ Panel centralizado planificado</li>
-                  <li>✓ Usuarios y accesos por función</li>
+                    <li>✓ Administración central de la flota</li>
+                    <li>✓ Responsables y permisos por vehículo</li>
                   <li>✓ Configuración asistida</li>
                   <li>✓ Precio por volumen</li>
                 </ul>
@@ -1649,6 +1486,8 @@ export function LandingPage() {
             <a href="#como">Cómo funciona</a>
             <a href="#beneficios">Beneficios</a>
             <a href="#seguridad">Seguridad</a>
+            <Link href="/productos">QR y accesorios</Link>
+            <Link href="/fiscalizacion/guia">Guía de fiscalización</Link>
           </div>
           <div>
             <b>Información</b>
@@ -1660,9 +1499,7 @@ export function LandingPage() {
           <div>
             <b>Contacto</b>
             <a href="#participar">Formulario de contacto y postulación</a>
-            <p className="corporate-email-note">
-              Correo corporativo en configuración.
-            </p>
+            <p className="project-owner">Responsable del proyecto:<br/><strong>Felipe Pardo Barrera</strong></p>
           </div>
         </div>
         <div className="container copyright">

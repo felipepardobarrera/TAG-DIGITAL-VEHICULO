@@ -13,7 +13,8 @@ test("renders the complete vehicle wallet landing page", async () => {
   assert.equal(response.status, 200);
   const html = await response.text();
   assert.match(html, /Todo lo importante de tu vehículo/);
-  assert.match(html, /Quiero acceso anticipado/);
+  assert.match(html, /Postular al programa piloto/);
+  assert.match(html, /12 meses sin costo/);
   assert.match(html, /PROGRAMA PILOTO/);
   assert.match(html, /AVISOS DE VENCIMIENTO/);
   assert.match(html, /Calendario personal/);

@@ -234,6 +234,21 @@
   flex-wrap: wrap;
 }
 
+.doc-actions .calendar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #8fc9e4;
+  border-radius: 7px;
+  padding: 7px 12px;
+  background: #eef9fe;
+  color: #006b9d;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .beta-docs .renew-button {
   border-color: #ff5a1f;
   color: #c73d0b;
@@ -244,7 +259,8 @@
     justify-content: stretch;
   }
 
-  .doc-actions button {
+  .doc-actions button,
+  .doc-actions a {
     flex: 1;
   }
 }

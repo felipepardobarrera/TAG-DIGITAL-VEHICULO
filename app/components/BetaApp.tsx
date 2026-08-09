@@ -5,27 +5,912 @@ import type { Session } from "@supabase/supabase-js";
 import { getSupabase } from "../lib/supabase";
 import { InspectionPanel } from "./InspectionPanel";
 
-type Vehicle={id:string;plate:string;make:string;model:string;model_year:number|null;nickname:string|null;is_fleet:boolean;driver_name:string|null;driver_whatsapp:string|null;driver_email:string|null};
-type Doc={id:string;vehicle_id:string;document_type:string;title:string;expires_on:string|null;storage_path:string;original_filename:string};
-type Offer={total_slots:number;claimed_slots:number;free_months:number};
-const vehicleBrands=["Alfa Romeo","Aston Martin","Audi","BAIC","Bentley","BMW","BYD","Changan","Chery","Chevrolet","Chrysler","Citroen","Cupra","Daewoo","DFM","DFSK","Dodge","Dong Feng","Dongfeng","DS","Exeed","Farizon","Ferrari","Fiat","Ford","Foton","GAC Motor","Geely","GWM","Honda","Hyundai","Isuzu","Iveco","JAC","Jaecoo","Jeep","Jetour","JIM","JMC","Kaiyi","Karry","KGM","Kia","KYC","Lada","Land Rover","Landking","Leapmotor","Lexus","Livan","Lynk & Co","Mahindra","MAN","Maserati","Maxus","Mazda","Mercedes-Benz","MG","Mini","Mitsubishi","Neta","Nissan","Omoda","Opel","Peugeot","Porsche","RAM","Renault","Riddara","Saab","Seat","Shineray","Skoda","Smart","Soueast","SsangYong","Subaru","Suzuki","SWM","Tesla","Toyota","Volkswagen","Volvo","Yutong","ZXAuto"];
-const types:Record<string,string>={permiso_circulacion:"Permiso de circulación",soap:"SOAP",revision_tecnica:"Revisión técnica",emisiones:"Certificado de emisiones",padron:"Padrón",homologacion:"Homologación",licencia:"Licencia de conducir",otro:"Otro documento"};
-const remaining=(date:string|null)=>{if(!date)return null;const now=new Date();now.setHours(0,0,0,0);return Math.ceil((new Date(`${date}T12:00:00`).getTime()-now.getTime())/86400000)};
-function FounderCountdown({offer}:{offer:Offer|null}){const available=offer?Math.max(offer.total_slots-offer.claimed_slots,0):10,percent=offer?(offer.claimed_slots/offer.total_slots)*100:0;return <div className={`founder-countdown ${available===0?"sold-out":""}`}><span className="founder-gift">12 MESES GRATIS</span><b>{available>0?`${available} de 10 cupos disponibles`:"Cupos fundadores agotados"}</b><p>{available>0?"Los primeros 10 registros confirmados obtienen acceso gratuito durante un año.":"Puedes registrarte para conocer los próximos planes."}</p><div aria-label={`${available} cupos disponibles`}><i style={{width:`${percent}%`}}/></div></div>}
+type Vehicle = {
+  id: string;
+  plate: string;
+  make: string;
+  model: string;
+  model_year: number | null;
+  nickname: string | null;
+  is_fleet: boolean;
+  driver_name: string | null;
+  driver_whatsapp: string | null;
+  driver_email: string | null;
+};
+type Doc = {
+  id: string;
+  vehicle_id: string;
+  document_type: string;
+  title: string;
+  expires_on: string | null;
+  storage_path: string;
+  original_filename: string;
+};
+type Offer = {
+  total_slots: number;
+  claimed_slots: number;
+  free_months: number;
+};
+const vehicleBrands = [
+  "Alfa Romeo",
+  "Aston Martin",
+  "Audi",
+  "BAIC",
+  "Bentley",
+  "BMW",
+  "BYD",
+  "Changan",
+  "Chery",
+  "Chevrolet",
+  "Chrysler",
+  "Citroen",
+  "Cupra",
+  "Daewoo",
+  "DFM",
+  "DFSK",
+  "Dodge",
+  "Dong Feng",
+  "Dongfeng",
+  "DS",
+  "Exeed",
+  "Farizon",
+  "Ferrari",
+  "Fiat",
+  "Ford",
+  "Foton",
+  "GAC Motor",
+  "Geely",
+  "GWM",
+  "Honda",
+  "Hyundai",
+  "Isuzu",
+  "Iveco",
+  "JAC",
+  "Jaecoo",
+  "Jeep",
+  "Jetour",
+  "JIM",
+  "JMC",
+  "Kaiyi",
+  "Karry",
+  "KGM",
+  "Kia",
+  "KYC",
+  "Lada",
+  "Land Rover",
+  "Landking",
+  "Leapmotor",
+  "Lexus",
+  "Livan",
+  "Lynk & Co",
+  "Mahindra",
+  "MAN",
+  "Maserati",
+  "Maxus",
+  "Mazda",
+  "Mercedes-Benz",
+  "MG",
+  "Mini",
+  "Mitsubishi",
+  "Neta",
+  "Nissan",
+  "Omoda",
+  "Opel",
+  "Peugeot",
+  "Porsche",
+  "RAM",
+  "Renault",
+  "Riddara",
+  "Saab",
+  "Seat",
+  "Shineray",
+  "Skoda",
+  "Smart",
+  "Soueast",
+  "SsangYong",
+  "Subaru",
+  "Suzuki",
+  "SWM",
+  "Tesla",
+  "Toyota",
+  "Volkswagen",
+  "Volvo",
+  "Yutong",
+  "ZXAuto",
+];
+const types: Record<string, string> = {
+  permiso_circulacion: "Permiso de circulación",
+  soap: "SOAP",
+  revision_tecnica: "Revisión técnica",
+  emisiones: "Certificado de emisiones",
+  padron: "Padrón",
+  homologacion: "Homologación",
+  licencia: "Licencia de conducir",
+  otro: "Otro documento",
+};
+const remaining = (date: string | null) => {
+  if (!date) return null;
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return Math.ceil(
+    (new Date(`${date}T12:00:00`).getTime() - now.getTime()) / 86400000,
+  );
+};
+const calendarDate = (date: string) => date.replaceAll("-", "");
+const nextCalendarDate = (date: string) => {
+  const d = new Date(`${date}T12:00:00`);
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10).replaceAll("-", "");
+};
+const googleCalendarUrl = (doc: Doc, vehicle?: Vehicle) => {
+  if (!doc.expires_on) return "#";
+  const title = `Vencimiento: ${doc.title}`,
+    details = `Vencimiento de ${doc.title}${vehicle ? ` del vehículo ${vehicle.nickname || vehicle.plate}` : ""}. Registrado en Billetera Vehicular.`;
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${calendarDate(doc.expires_on)}/${nextCalendarDate(doc.expires_on)}&details=${encodeURIComponent(details)}`;
+};
+const downloadCalendarEvent = (doc: Doc, vehicle?: Vehicle) => {
+  if (!doc.expires_on) return;
+  const now = new Date()
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}Z$/, "Z"),
+    description = `Vencimiento de ${doc.title}${vehicle ? ` del vehículo ${vehicle.nickname || vehicle.plate}` : ""}. Registrado en Billetera Vehicular.`,
+    escape = (value: string) =>
+      value
+        .replace(/\\/g, "\\\\")
+        .replace(/\n/g, "\\n")
+        .replace(/,/g, "\\,")
+        .replace(/;/g, "\\;");
+  const content = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Billetera Vehicular//ES",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      `UID:${doc.id}@billetera-vehicular.cl`,
+      `DTSTAMP:${now}`,
+      `DTSTART;VALUE=DATE:${calendarDate(doc.expires_on)}`,
+      `DTEND;VALUE=DATE:${nextCalendarDate(doc.expires_on)}`,
+      `SUMMARY:${escape(`Vencimiento: ${doc.title}`)}`,
+      `DESCRIPTION:${escape(description)}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n"),
+    blob = new Blob([content], { type: "text/calendar;charset=utf-8" }),
+    url = URL.createObjectURL(blob),
+    a = document.createElement("a");
+  a.href = url;
+  a.download = `vencimiento-${
+    doc.title
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") || "documento"
+  }.ics`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+function FounderCountdown({ offer }: { offer: Offer | null }) {
+  const available = offer
+      ? Math.max(offer.total_slots - offer.claimed_slots, 0)
+      : 10,
+    percent = offer ? (offer.claimed_slots / offer.total_slots) * 100 : 0;
+  return (
+    <div className={`founder-countdown ${available === 0 ? "sold-out" : ""}`}>
+      <span className="founder-gift">12 MESES GRATIS</span>
+      <b>
+        {available > 0
+          ? `${available} de 10 cupos disponibles`
+          : "Cupos fundadores agotados"}
+      </b>
+      <p>
+        {available > 0
+          ? "Los primeros 10 registros confirmados obtienen acceso gratuito durante un año."
+          : "Puedes registrarte para conocer los próximos planes."}
+      </p>
+      <div aria-label={`${available} cupos disponibles`}>
+        <i style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
+}
 
-export function BetaApp(){
- const supabase=useMemo(()=>getSupabase(),[]),[session,setSession]=useState<Session|null>(null),[checking,setChecking]=useState(true),[vehicles,setVehicles]=useState<Vehicle[]>([]),[docs,setDocs]=useState<Doc[]>([]),[vehicleId,setVehicleId]=useState(""),[notice,setNotice]=useState(""),[busy,setBusy]=useState(false),[mode,setMode]=useState<"login"|"signup">("signup"),[emailReminder,setEmailReminder]=useState(true),[savingPrefs,setSavingPrefs]=useState(false),[selectedMake,setSelectedMake]=useState(""),[isFleet,setIsFleet]=useState(false),[offer,setOffer]=useState<Offer|null>(null);
- useEffect(()=>{supabase.auth.getSession().then(({data})=>{setSession(data.session);setChecking(false)});const{data}=supabase.auth.onAuthStateChange((_e,next)=>{setSession(next);setChecking(false)});return()=>data.subscription.unsubscribe()},[supabase]);
- useEffect(()=>{const refresh=()=>supabase.from("beta_offer_stats").select("total_slots,claimed_slots,free_months").eq("offer_key","founders-2026").single().then(({data})=>{if(data)setOffer(data)});void refresh();const timer=setInterval(refresh,30000);return()=>clearInterval(timer)},[supabase]);
- useEffect(()=>{if(session)void load();else{setVehicles([]);setDocs([])}},[session]);
- async function load(){const[v,d,p]=await Promise.all([supabase.from("vehicles").select("id,plate,make,model,model_year,nickname,is_fleet,driver_name,driver_whatsapp,driver_email").order("created_at"),supabase.from("documents").select("id,vehicle_id,document_type,title,expires_on,storage_path,original_filename").order("expires_on"),supabase.from("notification_preferences").select("email_enabled,whatsapp_enabled").maybeSingle()]);if(v.error||d.error||p.error)return setNotice("No pudimos cargar tu billetera.");setVehicles(v.data||[]);setDocs(d.data||[]);setEmailReminder(p.data?.email_enabled??true);if(!vehicleId&&v.data?.[0])setVehicleId(v.data[0].id)}
- async function saveEmailPreference(enabled:boolean){if(!session)return;setEmailReminder(enabled);setSavingPrefs(true);const{error}=await supabase.from("notification_preferences").upsert({user_id:session.user.id,email_enabled:enabled,whatsapp_enabled:false},{onConflict:"user_id"});setSavingPrefs(false);setNotice(error?"No pudimos guardar tu preferencia.":enabled?"Los recordatorios por correo quedaron activados.":"Los recordatorios por correo quedaron desactivados.")}
- async function auth(e:FormEvent<HTMLFormElement>){e.preventDefault();setNotice("");const form=e.currentTarget,f=new FormData(form),email=String(f.get("email")||"").trim(),password=String(f.get("password")||"");if(!email)return setNotice("Primero escribe tu correo electrónico.");if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))return setNotice("Escribe un correo válido, por ejemplo: nombre@correo.cl.");if(!password)return setNotice("Ahora crea una contraseña de al menos 8 caracteres.");if(password.length<8)return setNotice("La contraseña debe tener al menos 8 caracteres.");setBusy(true);const r=mode==="signup"?await supabase.auth.signUp({email,password,options:{emailRedirectTo:`${location.origin}/auth/callback`}}):await supabase.auth.signInWithPassword({email,password});setBusy(false);if(r.error)return setNotice(r.error.message==="Invalid login credentials"?"Correo o contraseña incorrectos.":r.error.message);setNotice(mode==="signup"&&!r.data.session?"Cuenta creada. Revisa tu correo y pulsa el enlace de confirmación para activar tu acceso.":"Acceso correcto.")}
- async function addVehicle(e:FormEvent<HTMLFormElement>){e.preventDefault();if(!session)return;setBusy(true);const form=e.currentTarget,f=new FormData(form),make=String(f.get("make")||"").trim(),resolvedMake=make==="__other__"?String(f.get("make_other")||"").trim():make,fleet=f.get("is_fleet")==="on",driverWhatsapp=String(f.get("driver_whatsapp")||"").replace(/[\\s()-]/g,"");if(fleet&&!/^\\+569\\d{8}$/.test(driverWhatsapp)){setBusy(false);return setNotice("Ingresa el WhatsApp del chofer con formato +569XXXXXXXX.")}const{data,error}=await supabase.from("vehicles").insert({user_id:session.user.id,plate:String(f.get("plate")||"").toUpperCase().replace(/[^A-Z0-9]/g,""),make:resolvedMake,model:String(f.get("model")||"").trim(),model_year:f.get("year")?Number(f.get("year")):null,nickname:String(f.get("nickname")||"").trim()||null,is_fleet:fleet,driver_name:fleet?String(f.get("driver_name")||"").trim():null,driver_whatsapp:fleet?driverWhatsapp:null,driver_email:fleet?String(f.get("driver_email")||"").trim()||null:null}).select("id,plate,make,model,model_year,nickname,is_fleet,driver_name,driver_whatsapp,driver_email").single();setBusy(false);if(error)return setNotice(error.code==="23505"?"Esa patente ya está registrada.":"No pudimos guardar el vehículo. Revisa los datos del responsable.");setVehicles(x=>[...x,data]);setVehicleId(data.id);form.reset();setSelectedMake("");setIsFleet(false);setNotice(fleet?"Vehículo de flota y responsable guardados correctamente.":"Vehículo agregado correctamente.")}
- async function addDoc(e:FormEvent<HTMLFormElement>){e.preventDefault();if(!session||!vehicleId)return;setBusy(true);setNotice("");const form=e.currentTarget,f=new FormData(form),file=f.get("file") as File,allowed=["application/pdf","image/jpeg","image/png","image/webp"];if(!file||!file.size){setBusy(false);return setNotice("Selecciona un documento.")}if(file.size>10485760){setBusy(false);return setNotice("El archivo supera 10 MB.")}if(!allowed.includes(file.type)){setBusy(false);return setNotice("Usa PDF, JPG, PNG o WebP.")}const name=file.name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9._-]/g,"-"),path=`${session.user.id}/${vehicleId}/${crypto.randomUUID()}-${name}`,up=await supabase.storage.from("vehicle-documents").upload(path,file,{contentType:file.type});if(up.error){setBusy(false);return setNotice("No pudimos subir el archivo.")}const type=String(f.get("document_type")),saved=await supabase.from("documents").insert({vehicle_id:vehicleId,user_id:session.user.id,document_type:type,title:String(f.get("title")||"").trim()||types[type],expires_on:f.get("expires_on")||null,storage_path:path,original_filename:file.name,mime_type:file.type,file_size:file.size}).select("id,vehicle_id,document_type,title,expires_on,storage_path,original_filename").single();if(saved.error){await supabase.storage.from("vehicle-documents").remove([path]);setBusy(false);return setNotice("No pudimos registrar el documento.")}setDocs(x=>[...x,saved.data]);form.reset();setBusy(false);setNotice("Documento guardado de forma privada.")}
- async function open(doc:Doc){const{data,error}=await supabase.storage.from("vehicle-documents").createSignedUrl(doc.storage_path,60);if(error)return setNotice("No pudimos abrir el documento.");window.open(data.signedUrl,"_blank","noopener,noreferrer")}
- if(checking)return <main className="beta-shell beta-loading">Preparando tu billetera segura…</main>;
- if(!session)return <main className="beta-auth"><section><Link href="/" className="beta-back">← Volver al sitio</Link><div className="beta-logo"><span>BV</span><b>Billetera Vehicular</b></div><p className="beta-kicker">PROGRAMA BETA</p><h1>Tu vehículo, sus documentos y sus fechas en un solo lugar.</h1><FounderCountdown offer={offer}/><ul><li>Documentos privados</li><li>Vencimientos ordenados</li><li>Avisos por correo en preparación</li></ul></section><section className="beta-auth-card"><p className="beta-kicker">{mode==="signup"?"CREAR ACCESO":"INGRESAR"}</p><h2>{mode==="signup"?"Comienza tu billetera":"Bienvenido nuevamente"}</h2><div className="founder-mobile"><FounderCountdown offer={offer}/></div><p className="beta-auth-guide">{mode==="signup"?"Completa estos dos campos. Luego recibirás un correo para confirmar y activar tu cuenta.":"Escribe el correo y la contraseña que usaste al registrarte."}</p><form onSubmit={auth} noValidate><label>Correo electrónico<small>Ejemplo: nombre@correo.cl</small><input name="email" type="email" inputMode="email" autoComplete="email" placeholder="nombre@correo.cl" aria-describedby="email-help"/></label><label>Contraseña<small>{mode==="signup"?"Crea una clave de mínimo 8 caracteres.":"Ingresa tu contraseña."}</small><input name="password" type="password" minLength={8} autoComplete={mode==="signup"?"new-password":"current-password"} placeholder="Mínimo 8 caracteres"/></label><button disabled={busy}>{busy?"Espera…":mode==="signup"?"Crear mi cuenta beta":"Ingresar"}</button></form>{notice&&<p className="beta-notice" role="status">{notice}</p>}<button className="beta-switch" onClick={()=>{setMode(mode==="signup"?"login":"signup");setNotice("")}}>{mode==="signup"?"Ya tengo cuenta":"Quiero crear una cuenta"}</button><small>El beneficio se asigna al confirmar el correo, mientras existan cupos. Al continuar aceptas los <Link href="/terminos">términos</Link> y la <Link href="/privacidad">política de privacidad</Link>.</small></section></main>;
- const selectedVehicle=vehicles.find(v=>v.id===vehicleId),current=docs.filter(d=>d.vehicle_id===vehicleId);
- return <main className="beta-shell"><header className="beta-header"><Link href="/" className="beta-logo"><span>BV</span><b>Billetera Vehicular</b></Link><div><small>{session.user.email}</small><button onClick={()=>supabase.auth.signOut()}>Cerrar sesión</button></div></header><div className="beta-main"><aside><p className="beta-kicker">MIS VEHÍCULOS</p>{vehicles.map(v=><button key={v.id} className={vehicleId===v.id?"active":""} onClick={()=>setVehicleId(v.id)}><b>{v.nickname||`${v.make} ${v.model}`||"Mi vehículo"}</b><span>{v.plate}</span>{v.is_fleet&&v.driver_name&&<small>Chofer: {v.driver_name}</small>}</button>)}<details><summary>+ Agregar vehículo</summary><form onSubmit={addVehicle} className="beta-mini-form"><label>Patente<input name="plate" required minLength={4} maxLength={8} placeholder="ABCD12"/></label><label>Marca<select name="make" required value={selectedMake} onChange={e=>setSelectedMake(e.target.value)}><option value="" disabled>Selecciona una marca</option>{vehicleBrands.map(brand=><option key={brand} value={brand}>{brand}</option>)}<option value="__other__">Otra marca / no aparece</option></select></label>{selectedMake==="__other__"&&<label>Otra marca<input name="make_other" required placeholder="Escribe la marca"/></label>}<label>Modelo<input name="model" required placeholder="Corolla"/></label><label>Año<input name="year" type="number" min="1900" max="2100"/></label><label>Apodo<input name="nickname" placeholder="Auto familiar"/></label><label className="fleet-toggle"><input name="is_fleet" type="checkbox" checked={isFleet} onChange={e=>setIsFleet(e.target.checked)}/><span><b>Vehículo de flota</b><small>Asigna un chofer responsable</small></span></label>{isFleet&&<div className="fleet-fields"><label>Nombre del chofer<input name="driver_name" required placeholder="Nombre completo"/></label><label>WhatsApp del chofer<input name="driver_whatsapp" type="tel" required inputMode="tel" pattern="\\+569[0-9]{8}" maxLength={12} placeholder="+569XXXXXXXX"/></label><label>Correo del chofer (opcional)<input name="driver_email" type="email" placeholder="chofer@correo.cl"/></label><small>El WhatsApp quedará preparado para avisos de vencimientos y mantenciones cuando activemos la integración.</small></div>}<button disabled={busy}>Guardar vehículo</button></form></details></aside><section className="beta-content"><div className="beta-welcome"><div><p className="beta-kicker">MI BILLETERA</p><h1>{vehicles.length?"Todo lo importante, bajo control.":"Agrega tu primer vehículo."}</h1><p>{vehicles.length?"Carga documentos y registra sus vencimientos.":"Después podrás guardar sus documentos de forma privada."}</p></div><div className="beta-status"><b>{docs.length}</b><span>documentos guardados</span></div></div>{notice&&<p className="beta-notice">{notice}</p>}<section className="beta-panel"><h2>¿Dónde quieres recibir los recordatorios?</h2><p className="beta-channel-intro">Puedes elegir uno o ambos canales. WhatsApp se habilitará cuando terminemos su integración.</p><div className="beta-channels"><label className={emailReminder?"selected":""}><input type="checkbox" checked={emailReminder} disabled={savingPrefs} onChange={e=>void saveEmailPreference(e.target.checked)}/><span className="channel-icon">@</span><span><b>Recordatorio por correo</b><small>{session.user.email}</small></span><em>Disponible</em></label><label className="disabled"><input type="checkbox" disabled/><span className="channel-icon">W</span><span><b>Recordatorio por WhatsApp</b><small>Recibir avisos en tu teléfono</small></span><em>En preparación</em></label></div><small>Cuando WhatsApp esté disponible podrás activar ambos y recibir el mismo aviso en los dos canales.</small></section>{selectedVehicle&&<InspectionPanel supabase={supabase} session={session} vehicle={selectedVehicle} documents={current} onNotice={setNotice}/>} {vehicleId&&<><section className="beta-panel"><h2>Documentos</h2>{!current.length?<p className="beta-empty">Todavía no hay documentos para este vehículo.</p>:<div className="beta-docs">{current.map(doc=>{const days=remaining(doc.expires_on);return <article key={doc.id}><div><small>{types[doc.document_type]||"Documento"}</small><h3>{doc.title}</h3><span>{doc.expires_on?`Vence el ${new Intl.DateTimeFormat("es-CL").format(new Date(`${doc.expires_on}T12:00:00`))}`:"Sin vencimiento"}</span></div><div className={days!==null&&days<0?"expired":days!==null&&days<=30?"warning":"valid"}>{days===null?"Guardado":days<0?"Vencido":days===0?"Vence hoy":`${days} días`}</div><div className="doc-actions"><button onClick={()=>open(doc)}>Ver</button>{days!==null&&days<0&&<button className="renew-button" onClick={()=>setNotice(`Sube la renovación de ${types[doc.document_type]||doc.title} en el formulario inferior. Al guardarla vigente, los avisos diarios se detendrán.`)}>Renovar</button>}</div></article>})}</div>}</section><section className="beta-panel"><h2>Agregar documento</h2><form onSubmit={addDoc} className="beta-doc-form"><label>Tipo<select name="document_type" required>{Object.entries(types).map(([v,l])=><option key={v} value={v}>{l}</option>)}</select></label><label>Nombre<input name="title" placeholder="Se completa automáticamente"/></label><label>Fecha de vencimiento<input name="expires_on" type="date"/></label><label>Archivo<input name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" required/></label><button disabled={busy}>{busy?"Guardando…":"Guardar documento"}</button></form><small>PDF o imagen · máximo 10 MB · acceso privado</small></section></>}</section></div></main>
+export function BetaApp() {
+  const supabase = useMemo(() => getSupabase(), []),
+    [session, setSession] = useState<Session | null>(null),
+    [checking, setChecking] = useState(true),
+    [vehicles, setVehicles] = useState<Vehicle[]>([]),
+    [docs, setDocs] = useState<Doc[]>([]),
+    [vehicleId, setVehicleId] = useState(""),
+    [notice, setNotice] = useState(""),
+    [busy, setBusy] = useState(false),
+    [mode, setMode] = useState<"login" | "signup">("signup"),
+    [emailReminder, setEmailReminder] = useState(true),
+    [savingPrefs, setSavingPrefs] = useState(false),
+    [selectedMake, setSelectedMake] = useState(""),
+    [isFleet, setIsFleet] = useState(false),
+    [offer, setOffer] = useState<Offer | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setChecking(false);
+    });
+    const { data } = supabase.auth.onAuthStateChange((_e, next) => {
+      setSession(next);
+      setChecking(false);
+    });
+    return () => data.subscription.unsubscribe();
+  }, [supabase]);
+  useEffect(() => {
+    const refresh = () =>
+      supabase
+        .from("beta_offer_stats")
+        .select("total_slots,claimed_slots,free_months")
+        .eq("offer_key", "founders-2026")
+        .single()
+        .then(({ data }) => {
+          if (data) setOffer(data);
+        });
+    void refresh();
+    const timer = setInterval(refresh, 30000);
+    return () => clearInterval(timer);
+  }, [supabase]);
+  useEffect(() => {
+    if (session) void load();
+    else {
+      setVehicles([]);
+      setDocs([]);
+    }
+  }, [session]);
+  async function load() {
+    const [v, d, p] = await Promise.all([
+      supabase
+        .from("vehicles")
+        .select(
+          "id,plate,make,model,model_year,nickname,is_fleet,driver_name,driver_whatsapp,driver_email",
+        )
+        .order("created_at"),
+      supabase
+        .from("documents")
+        .select(
+          "id,vehicle_id,document_type,title,expires_on,storage_path,original_filename",
+        )
+        .order("expires_on"),
+      supabase
+        .from("notification_preferences")
+        .select("email_enabled,whatsapp_enabled")
+        .maybeSingle(),
+    ]);
+    if (v.error || d.error || p.error)
+      return setNotice("No pudimos cargar tu billetera.");
+    setVehicles(v.data || []);
+    setDocs(d.data || []);
+    setEmailReminder(p.data?.email_enabled ?? true);
+    if (!vehicleId && v.data?.[0]) setVehicleId(v.data[0].id);
+  }
+  async function saveEmailPreference(enabled: boolean) {
+    if (!session) return;
+    setEmailReminder(enabled);
+    setSavingPrefs(true);
+    const { error } = await supabase
+      .from("notification_preferences")
+      .upsert(
+        {
+          user_id: session.user.id,
+          email_enabled: enabled,
+          whatsapp_enabled: false,
+        },
+        { onConflict: "user_id" },
+      );
+    setSavingPrefs(false);
+    setNotice(
+      error
+        ? "No pudimos guardar tu preferencia."
+        : enabled
+          ? "Los recordatorios por correo quedaron activados."
+          : "Los recordatorios por correo quedaron desactivados.",
+    );
+  }
+  async function auth(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setNotice("");
+    const form = e.currentTarget,
+      f = new FormData(form),
+      email = String(f.get("email") || "").trim(),
+      password = String(f.get("password") || "");
+    if (!email) return setNotice("Primero escribe tu correo electrónico.");
+    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))
+      return setNotice(
+        "Escribe un correo válido, por ejemplo: nombre@correo.cl.",
+      );
+    if (!password)
+      return setNotice("Ahora crea una contraseña de al menos 8 caracteres.");
+    if (password.length < 8)
+      return setNotice("La contraseña debe tener al menos 8 caracteres.");
+    setBusy(true);
+    const r =
+      mode === "signup"
+        ? await supabase.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: `${location.origin}/auth/callback` },
+          })
+        : await supabase.auth.signInWithPassword({ email, password });
+    setBusy(false);
+    if (r.error)
+      return setNotice(
+        r.error.message === "Invalid login credentials"
+          ? "Correo o contraseña incorrectos."
+          : r.error.message,
+      );
+    setNotice(
+      mode === "signup" && !r.data.session
+        ? "Cuenta creada. Revisa tu correo y pulsa el enlace de confirmación para activar tu acceso."
+        : "Acceso correcto.",
+    );
+  }
+  async function addVehicle(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!session) return;
+    setBusy(true);
+    const form = e.currentTarget,
+      f = new FormData(form),
+      make = String(f.get("make") || "").trim(),
+      resolvedMake =
+        make === "__other__" ? String(f.get("make_other") || "").trim() : make,
+      fleet = f.get("is_fleet") === "on",
+      driverWhatsapp = String(f.get("driver_whatsapp") || "").replace(
+        /[\\s()-]/g,
+        "",
+      );
+    if (fleet && !/^\\+569\\d{8}$/.test(driverWhatsapp)) {
+      setBusy(false);
+      return setNotice(
+        "Ingresa el WhatsApp del conductor responsable con formato +569XXXXXXXX.",
+      );
+    }
+    const { data, error } = await supabase
+      .from("vehicles")
+      .insert({
+        user_id: session.user.id,
+        plate: String(f.get("plate") || "")
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, ""),
+        make: resolvedMake,
+        model: String(f.get("model") || "").trim(),
+        model_year: f.get("year") ? Number(f.get("year")) : null,
+        nickname: String(f.get("nickname") || "").trim() || null,
+        is_fleet: fleet,
+        driver_name: fleet ? String(f.get("driver_name") || "").trim() : null,
+        driver_whatsapp: fleet ? driverWhatsapp : null,
+        driver_email: fleet
+          ? String(f.get("driver_email") || "").trim() || null
+          : null,
+      })
+      .select(
+        "id,plate,make,model,model_year,nickname,is_fleet,driver_name,driver_whatsapp,driver_email",
+      )
+      .single();
+    setBusy(false);
+    if (error)
+      return setNotice(
+        error.code === "23505"
+          ? "Esa patente ya está registrada."
+          : "No pudimos guardar el vehículo. Revisa los datos del responsable.",
+      );
+    setVehicles((x) => [...x, data]);
+    setVehicleId(data.id);
+    form.reset();
+    setSelectedMake("");
+    setIsFleet(false);
+    setNotice(
+      fleet
+        ? "Vehículo de flota y responsable guardados correctamente."
+        : "Vehículo agregado correctamente.",
+    );
+  }
+  async function addDoc(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!session || !vehicleId) return;
+    setBusy(true);
+    setNotice("");
+    const form = e.currentTarget,
+      f = new FormData(form),
+      file = f.get("file") as File,
+      allowed = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
+    if (!file || !file.size) {
+      setBusy(false);
+      return setNotice("Selecciona un documento.");
+    }
+    if (file.size > 10485760) {
+      setBusy(false);
+      return setNotice("El archivo supera 10 MB.");
+    }
+    if (!allowed.includes(file.type)) {
+      setBusy(false);
+      return setNotice("Usa PDF, JPG, PNG o WebP.");
+    }
+    const name = file.name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9._-]/g, "-"),
+      path = `${session.user.id}/${vehicleId}/${crypto.randomUUID()}-${name}`,
+      up = await supabase.storage
+        .from("vehicle-documents")
+        .upload(path, file, { contentType: file.type });
+    if (up.error) {
+      setBusy(false);
+      return setNotice("No pudimos subir el archivo.");
+    }
+    const type = String(f.get("document_type")),
+      saved = await supabase
+        .from("documents")
+        .insert({
+          vehicle_id: vehicleId,
+          user_id: session.user.id,
+          document_type: type,
+          title: String(f.get("title") || "").trim() || types[type],
+          expires_on: f.get("expires_on") || null,
+          storage_path: path,
+          original_filename: file.name,
+          mime_type: file.type,
+          file_size: file.size,
+        })
+        .select(
+          "id,vehicle_id,document_type,title,expires_on,storage_path,original_filename",
+        )
+        .single();
+    if (saved.error) {
+      await supabase.storage.from("vehicle-documents").remove([path]);
+      setBusy(false);
+      return setNotice("No pudimos registrar el documento.");
+    }
+    setDocs((x) => [...x, saved.data]);
+    form.reset();
+    setBusy(false);
+    setNotice("Documento guardado de forma privada.");
+  }
+  async function open(doc: Doc) {
+    const { data, error } = await supabase.storage
+      .from("vehicle-documents")
+      .createSignedUrl(doc.storage_path, 60);
+    if (error) return setNotice("No pudimos abrir el documento.");
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  }
+  if (checking)
+    return (
+      <main className="beta-shell beta-loading">
+        Preparando tu billetera segura…
+      </main>
+    );
+  if (!session)
+    return (
+      <main className="beta-auth">
+        <section>
+          <Link href="/" className="beta-back">
+            ← Volver al sitio
+          </Link>
+          <div className="beta-logo">
+            <span>BV</span>
+            <b>Billetera Vehicular</b>
+          </div>
+          <p className="beta-kicker">PROGRAMA BETA</p>
+          <h1>Tu vehículo, sus documentos y sus fechas en un solo lugar.</h1>
+          <FounderCountdown offer={offer} />
+          <ul>
+            <li>Documentos privados</li>
+            <li>Vencimientos ordenados</li>
+            <li>Avisos por correo en preparación</li>
+          </ul>
+        </section>
+        <section className="beta-auth-card">
+          <p className="beta-kicker">
+            {mode === "signup" ? "CREAR ACCESO" : "INGRESAR"}
+          </p>
+          <h2>
+            {mode === "signup"
+              ? "Comienza tu billetera"
+              : "Bienvenido nuevamente"}
+          </h2>
+          <div className="founder-mobile">
+            <FounderCountdown offer={offer} />
+          </div>
+          <p className="beta-auth-guide">
+            {mode === "signup"
+              ? "Completa estos dos campos. Luego recibirás un correo para confirmar y activar tu cuenta."
+              : "Escribe el correo y la contraseña que usaste al registrarte."}
+          </p>
+          <form onSubmit={auth} noValidate>
+            <label>
+              Correo electrónico<small>Ejemplo: nombre@correo.cl</small>
+              <input
+                name="email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                placeholder="nombre@correo.cl"
+                aria-describedby="email-help"
+              />
+            </label>
+            <label>
+              Contraseña
+              <small>
+                {mode === "signup"
+                  ? "Crea una clave de mínimo 8 caracteres."
+                  : "Ingresa tu contraseña."}
+              </small>
+              <input
+                name="password"
+                type="password"
+                minLength={8}
+                autoComplete={
+                  mode === "signup" ? "new-password" : "current-password"
+                }
+                placeholder="Mínimo 8 caracteres"
+              />
+            </label>
+            <button disabled={busy}>
+              {busy
+                ? "Espera…"
+                : mode === "signup"
+                  ? "Crear mi cuenta beta"
+                  : "Ingresar"}
+            </button>
+          </form>
+          {notice && (
+            <p className="beta-notice" role="status">
+              {notice}
+            </p>
+          )}
+          <button
+            className="beta-switch"
+            onClick={() => {
+              setMode(mode === "signup" ? "login" : "signup");
+              setNotice("");
+            }}
+          >
+            {mode === "signup" ? "Ya tengo cuenta" : "Quiero crear una cuenta"}
+          </button>
+          <small>
+            El beneficio se asigna al confirmar el correo, mientras existan
+            cupos. Al continuar aceptas los{" "}
+            <Link href="/terminos">términos</Link> y la{" "}
+            <Link href="/privacidad">política de privacidad</Link>.
+          </small>
+        </section>
+      </main>
+    );
+  const selectedVehicle = vehicles.find((v) => v.id === vehicleId),
+    current = docs.filter((d) => d.vehicle_id === vehicleId);
+  return (
+    <main className="beta-shell">
+      <header className="beta-header">
+        <Link href="/" className="beta-logo">
+          <span>BV</span>
+          <b>Billetera Vehicular</b>
+        </Link>
+        <div>
+          <small>{session.user.email}</small>
+          <button onClick={() => supabase.auth.signOut()}>Cerrar sesión</button>
+        </div>
+      </header>
+      <div className="beta-main">
+        <aside>
+          <p className="beta-kicker">MIS VEHÍCULOS</p>
+          {vehicles.map((v) => (
+            <button
+              key={v.id}
+              className={vehicleId === v.id ? "active" : ""}
+              onClick={() => setVehicleId(v.id)}
+            >
+              <b>{v.nickname || `${v.make} ${v.model}` || "Mi vehículo"}</b>
+              <span>{v.plate}</span>
+              {v.is_fleet && v.driver_name && (
+                <small>Chofer: {v.driver_name}</small>
+              )}
+            </button>
+          ))}
+          <details>
+            <summary>+ Agregar vehículo</summary>
+            <form onSubmit={addVehicle} className="beta-mini-form">
+              <label>
+                Patente
+                <input
+                  name="plate"
+                  required
+                  minLength={4}
+                  maxLength={8}
+                  placeholder="ABCD12"
+                />
+              </label>
+              <label>
+                Marca
+                <select
+                  name="make"
+                  required
+                  value={selectedMake}
+                  onChange={(e) => setSelectedMake(e.target.value)}
+                >
+                  <option value="" disabled>
+                    Selecciona una marca
+                  </option>
+                  {vehicleBrands.map((brand) => (
+                    <option key={brand} value={brand}>
+                      {brand}
+                    </option>
+                  ))}
+                  <option value="__other__">Otra marca / no aparece</option>
+                </select>
+              </label>
+              {selectedMake === "__other__" && (
+                <label>
+                  Otra marca
+                  <input
+                    name="make_other"
+                    required
+                    placeholder="Escribe la marca"
+                  />
+                </label>
+              )}
+              <label>
+                Modelo
+                <input name="model" required placeholder="Corolla" />
+              </label>
+              <label>
+                Año
+                <input name="year" type="number" min="1900" max="2100" />
+              </label>
+              <label>
+                Apodo
+                <input name="nickname" placeholder="Auto familiar" />
+              </label>
+              <label className="fleet-toggle">
+                <input
+                  name="is_fleet"
+                  type="checkbox"
+                  checked={isFleet}
+                  onChange={(e) => setIsFleet(e.target.checked)}
+                />
+                <span>
+                  <b>Vehículo de flota</b>
+                  <small>Asigna un conductor responsable</small>
+                </span>
+              </label>
+              {isFleet && (
+                <div className="fleet-fields">
+                  <label>
+                    Nombre del conductor responsable
+                    <input
+                      name="driver_name"
+                      required
+                      placeholder="Nombre completo"
+                    />
+                  </label>
+                  <label>
+                    WhatsApp del conductor responsable
+                    <input
+                      name="driver_whatsapp"
+                      type="tel"
+                      required
+                      inputMode="tel"
+                      pattern="\\+569[0-9]{8}"
+                      maxLength={12}
+                      placeholder="+569XXXXXXXX"
+                    />
+                  </label>
+                  <label>
+                    Correo del conductor responsable (opcional)
+                    <input
+                      name="driver_email"
+                      type="email"
+                      placeholder="chofer@correo.cl"
+                    />
+                  </label>
+                  <small>
+                    El WhatsApp quedará preparado para avisos de vencimientos y
+                    mantenciones cuando activemos la integración.
+                  </small>
+                </div>
+              )}
+              <button disabled={busy}>Guardar vehículo</button>
+            </form>
+          </details>
+        </aside>
+        <section className="beta-content">
+          <div className="beta-welcome">
+            <div>
+              <p className="beta-kicker">MI BILLETERA</p>
+              <h1>
+                {vehicles.length
+                  ? "Todo lo importante, bajo control."
+                  : "Agrega tu primer vehículo."}
+              </h1>
+              <p>
+                {vehicles.length
+                  ? "Carga documentos y registra sus vencimientos."
+                  : "Después podrás guardar sus documentos de forma privada."}
+              </p>
+            </div>
+            <div className="beta-status">
+              <b>{docs.length}</b>
+              <span>documentos guardados</span>
+            </div>
+          </div>
+          {notice && <p className="beta-notice">{notice}</p>}
+          <section className="beta-panel">
+            <h2>¿Dónde quieres recibir los recordatorios?</h2>
+            <p className="beta-channel-intro">
+              Activa los avisos por correo. Además, cada documento con fecha de
+              vencimiento puede agregarse a tu calendario personal.
+            </p>
+            <div className="beta-channels">
+              <label className={emailReminder ? "selected" : ""}>
+                <input
+                  type="checkbox"
+                  checked={emailReminder}
+                  disabled={savingPrefs}
+                  onChange={(e) => void saveEmailPreference(e.target.checked)}
+                />
+                <span className="channel-icon">@</span>
+                <span>
+                  <b>Recordatorio por correo</b>
+                  <small>{session.user.email}</small>
+                </span>
+                <em>Disponible</em>
+              </label>
+              <label className="disabled">
+                <input type="checkbox" disabled />
+                <span className="channel-icon">W</span>
+                <span>
+                  <b>Recordatorio por WhatsApp</b>
+                  <small>Recibir avisos en tu teléfono</small>
+                </span>
+                <em>En preparación</em>
+              </label>
+            </div>
+            <small>
+              WhatsApp se habilitará cuando finalice su integración. Entonces
+              podrás recibir avisos por ambos canales.
+            </small>
+          </section>
+          {selectedVehicle && (
+            <InspectionPanel
+              supabase={supabase}
+              session={session}
+              vehicle={selectedVehicle}
+              documents={current}
+              onNotice={setNotice}
+            />
+          )}{" "}
+          {vehicleId && (
+            <>
+              <section className="beta-panel">
+                <h2>Documentos</h2>
+                {!current.length ? (
+                  <p className="beta-empty">
+                    Todavía no hay documentos para este vehículo.
+                  </p>
+                ) : (
+                  <div className="beta-docs">
+                    {current.map((doc) => {
+                      const days = remaining(doc.expires_on);
+                      return (
+                        <article key={doc.id}>
+                          <div>
+                            <small>
+                              {types[doc.document_type] || "Documento"}
+                            </small>
+                            <h3>{doc.title}</h3>
+                            <span>
+                              {doc.expires_on
+                                ? `Vence el ${new Intl.DateTimeFormat("es-CL").format(new Date(`${doc.expires_on}T12:00:00`))}`
+                                : "Sin vencimiento"}
+                            </span>
+                          </div>
+                          <div
+                            className={
+                              days !== null && days < 0
+                                ? "expired"
+                                : days !== null && days <= 30
+                                  ? "warning"
+                                  : "valid"
+                            }
+                          >
+                            {days === null
+                              ? "Guardado"
+                              : days < 0
+                                ? "Vencido"
+                                : days === 0
+                                  ? "Vence hoy"
+                                  : `${days} días`}
+                          </div>
+                        <div className="doc-actions">
+                          <button onClick={() => open(doc)}>Ver</button>
+                          {doc.expires_on && (
+                            <>
+                              <a
+                                className="calendar-button"
+                                href={googleCalendarUrl(doc, selectedVehicle)}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Google Calendar
+                              </a>
+                              <button
+                                className="calendar-button"
+                                onClick={() =>
+                                  downloadCalendarEvent(doc, selectedVehicle)
+                                }
+                              >
+                                Otros calendarios
+                              </button>
+                            </>
+                          )}
+                          {days !== null && days < 0 && (
+                              <button
+                                className="renew-button"
+                                onClick={() =>
+                                  setNotice(
+                                    `Sube la renovación de ${types[doc.document_type] || doc.title} en el formulario inferior. Al guardarla vigente, los avisos diarios se detendrán.`,
+                                  )
+                                }
+                              >
+                                Renovar
+                              </button>
+                            )}
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+              <section className="beta-panel">
+                <h2>Agregar documento</h2>
+                <form onSubmit={addDoc} className="beta-doc-form">
+                  <label>
+                    Tipo
+                    <select name="document_type" required>
+                      {Object.entries(types).map(([v, l]) => (
+                        <option key={v} value={v}>
+                          {l}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Nombre
+                    <input
+                      name="title"
+                      placeholder="Se completa automáticamente"
+                    />
+                  </label>
+                  <label>
+                    Fecha de vencimiento
+                    <input name="expires_on" type="date" />
+                  </label>
+                  <label>
+                    Archivo
+                    <input
+                      name="file"
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png,.webp"
+                      required
+                    />
+                  </label>
+                  <button disabled={busy}>
+                    {busy ? "Guardando…" : "Guardar documento"}
+                  </button>
+                </form>
+                <small>PDF o imagen · máximo 10 MB · acceso privado</small>
+              </section>
+            </>
+          )}
+        </section>
+      </div>
+    </main>
+  );
 }

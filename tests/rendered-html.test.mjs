@@ -14,10 +14,11 @@ test("renders the complete vehicle wallet landing page", async () => {
   const html = await response.text();
   assert.match(html, /Todo lo importante de tu vehículo/);
   assert.match(html, /Quiero acceso anticipado/);
-  assert.match(html, /PROGRAMA DE USUARIOS FUNDADORES/);
-  assert.match(html, /PRÓXIMAMENTE/);
+  assert.match(html, /PROGRAMA PILOTO/);
+  assert.match(html, /AVISOS DE VENCIMIENTO/);
+  assert.match(html, /Calendario personal/);
   assert.match(html, /Política de privacidad/);
-  assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Lorem ipsum|WhatsApp/);
+  assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Lorem ipsum|MVP/);
 });
 
 test("renders legal information", async () => {

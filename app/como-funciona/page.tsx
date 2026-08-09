@@ -3,7 +3,7 @@ import { FeatureCard, MarketingPage, PageCta } from "../components/MarketingPage
 export default function HowItWorksPage(){return <MarketingPage eyebrow="GUÍA COMPLETA" title="Desde el registro hasta una fiscalización, sin perderte." intro="Conoce el recorrido completo de Billetera Vehicular y qué funciones están disponibles durante la prueba beta.">
   <section className="marketing-section"><div className="container marketing-steps">
     <FeatureCard icon="01" title="Crea y confirma tu cuenta"><p>Regístrate con un correo al que tengas acceso. Recibirás un enlace para confirmar tu identidad antes de ingresar.</p></FeatureCard>
-    <FeatureCard icon="02" title="Registra tu vehículo"><p>Agrega patente, marca, modelo, año y un apodo. En flotas también puedes asignar un chofer responsable.</p></FeatureCard>
+    <FeatureCard icon="02" title="Registra tu vehículo"><p>Agrega patente, marca, modelo, año y un nombre de referencia. En flotas también puedes asignar un conductor responsable.</p></FeatureCard>
     <FeatureCard icon="03" title="Carga documentos"><p>Selecciona el tipo de documento, informa su vencimiento y sube una fotografía o PDF legible.</p></FeatureCard>
     <FeatureCard icon="04" title="Configura los avisos"><p>El correo será el primer canal. WhatsApp aparecerá deshabilitado hasta completar su integración empresarial.</p></FeatureCard>
     <FeatureCard icon="05" title="Genera un acceso temporal"><p>Cuando necesites mostrar información, crea un QR de solo lectura válido durante cinco minutos.</p></FeatureCard>
